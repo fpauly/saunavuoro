@@ -2,21 +2,21 @@
 
 A backend application for booking sauna turns in a Finnish apartment building, built for the Software Architecture course (autumn 2026).
 
-> **Status:** Early development. Sections marked *TBD* will be completed as the project progresses.
+> **Status:** Early development. Sections marked _TBD_ will be completed as the project progresses.
 
 ## Project Overview
 
-Many Finnish apartment buildings have a shared sauna that residents use in turns (*saunavuoro*). Each apartment can have a weekly fixed turn, and free hours can be booked separately.
+Many Finnish apartment buildings have a shared sauna that residents use in turns (_saunavuoro_). Each apartment can have a weekly fixed turn, and free hours can be booked separately.
 
 SaunaVuoro provides a REST API for managing apartments, residents, saunas, weekly turns and one-off bookings. The application enforces the building's booking rules, such as preventing overlapping turns and limiting the number of bookings per week.
 
 The project follows **Clean Architecture**, with the code split into four layers:
 
-| Layer | Folder | Responsibility |
-|---|---|---|
-| Domain | `src/saunavuoro/domain` | Entities, value objects and business rules |
-| Application | `src/saunavuoro/application` | Use cases and interfaces (ports) |
-| API | `src/saunavuoro/api` | REST endpoints and request/response models |
+| Layer          | Folder                          | Responsibility                              |
+| -------------- | ------------------------------- | ------------------------------------------- |
+| Domain         | `src/saunavuoro/domain`         | Entities, value objects and business rules  |
+| Application    | `src/saunavuoro/application`    | Use cases and interfaces (ports)            |
+| API            | `src/saunavuoro/api`            | REST endpoints and request/response models  |
 | Infrastructure | `src/saunavuoro/infrastructure` | Database access and other external concerns |
 
 ## Technology
@@ -47,15 +47,15 @@ saunavuoro/
 
 ## Installation
 
-*TBD*
+_TBD_
 
 ## Setup
 
-*TBD* (database with Docker Compose, environment variables, migrations)
+_TBD_ (database with Docker Compose, environment variables, migrations)
 
 ## Running the Application
 
-*TBD*
+_TBD_
 
 ## API Access
 
@@ -63,7 +63,7 @@ Once running, the interactive Swagger UI will be available at `http://localhost:
 
 ## Running Tests
 
-*TBD*
+_TBD_
 
 ## Documentation
 
@@ -85,7 +85,4 @@ Once running, the interactive Swagger UI will be available at `http://localhost:
 
 ## Team
 
-- [Name 1]
-- [Name 2]
-- [Name 3]
-- [Name 4]
+- [Fan Yin]
