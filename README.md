@@ -85,4 +85,4 @@ _TBD_
 
 ## Team
 
-- [Fan Yin]
+- Fan Yin
