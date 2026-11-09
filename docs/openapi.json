@@ -1,0 +1,423 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SaunaVuoro API",
+    "description": "\nREST API for booking sauna turns in a Finnish apartment building.\n\n* Interactive documentation (Swagger UI): `/docs`\n* Alternative documentation (ReDoc): `/redoc`\n* OpenAPI specification: `/openapi.json`\n\nAll errors return JSON with a `detail` field.\n",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v1/apartments": {
+      "get": {
+        "tags": [
+          "apartments"
+        ],
+        "summary": "List apartments",
+        "description": "Return all apartments, sorted by number.",
+        "operationId": "list_apartments_api_v1_apartments_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ApartmentOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Apartments Api V1 Apartments Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "apartments"
+        ],
+        "summary": "Create an apartment",
+        "description": "Add a new apartment to the building. Apartment numbers must be unique.",
+        "operationId": "create_apartment_api_v1_apartments_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApartmentIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApartmentOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicts with existing data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request data, or a business rule was broken.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorResponse"
+                    }
+                  ],
+                  "title": "Response 422 Create Apartment Api V1 Apartments Post"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/apartments/{apartment_id}": {
+      "get": {
+        "tags": [
+          "apartments"
+        ],
+        "summary": "Get an apartment",
+        "description": "Return one apartment by its id.",
+        "operationId": "get_apartment_api_v1_apartments__apartment_id__get",
+        "parameters": [
+          {
+            "name": "apartment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Apartment Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApartmentOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request data, or a business rule was broken.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorResponse"
+                    }
+                  ],
+                  "title": "Response 422 Get Apartment Api V1 Apartments  Apartment Id  Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "apartments"
+        ],
+        "summary": "Update an apartment",
+        "description": "Change the apartment number. The new number must not belong to another apartment.",
+        "operationId": "update_apartment_api_v1_apartments__apartment_id__put",
+        "parameters": [
+          {
+            "name": "apartment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Apartment Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApartmentIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApartmentOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicts with existing data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request data, or a business rule was broken.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorResponse"
+                    }
+                  ],
+                  "title": "Response 422 Update Apartment Api V1 Apartments  Apartment Id  Put"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "apartments"
+        ],
+        "summary": "Delete an apartment",
+        "description": "Remove an apartment from the building.",
+        "operationId": "delete_apartment_api_v1_apartments__apartment_id__delete",
+        "parameters": [
+          {
+            "name": "apartment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Apartment Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "The resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request data, or a business rule was broken.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorResponse"
+                    }
+                  ],
+                  "title": "Response 422 Delete Apartment Api V1 Apartments  Apartment Id  Delete"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApartmentIn": {
+        "properties": {
+          "number": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Number",
+            "description": "Apartment number. Stored in upper case without extra spaces.",
+            "examples": [
+              "A 12"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "number"
+        ],
+        "title": "ApartmentIn",
+        "description": "Data for creating or updating an apartment."
+      },
+      "ApartmentOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Unique identifier of the apartment."
+          },
+          "number": {
+            "type": "string",
+            "title": "Number",
+            "description": "Apartment number.",
+            "examples": [
+              "A 12"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number"
+        ],
+        "title": "ApartmentOut",
+        "description": "An apartment in the building."
+      },
+      "ErrorResponse": {
+        "properties": {
+          "detail": {
+            "type": "string",
+            "title": "Detail",
+            "examples": [
+              "Apartment A 1 already exists."
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "detail"
+        ],
+        "title": "ErrorResponse",
+        "description": "Returned when a use case or a business rule rejects the request."
+      },
+      "ValidationErrorResponse": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationIssue"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "detail"
+        ],
+        "title": "ValidationErrorResponse",
+        "description": "Returned by FastAPI when the request body or parameters are invalid."
+      },
+      "ValidationIssue": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Loc",
+            "examples": [
+              [
+                "body",
+                "number"
+              ]
+            ]
+          },
+          "msg": {
+            "type": "string",
+            "title": "Msg",
+            "examples": [
+              "Field required"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "title": "Type",
+            "examples": [
+              "missing"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationIssue"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "apartments",
+      "description": "Apartments of the building (administrator)."
+    }
+  ]
+}
