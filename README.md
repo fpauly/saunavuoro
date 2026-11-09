@@ -2,7 +2,7 @@
 
 A backend application for booking sauna turns in a Finnish apartment building, built for the Software Architecture course (autumn 2026).
 
-> **Status:** Early development. Sections marked _TBD_ will be completed as the project progresses.
+> **Status:** Early development. The architecture skeleton is in place, with `Apartment` CRUD implemented as the example feature.
 
 ## Project Overview
 
@@ -31,39 +31,69 @@ The project follows **Clean Architecture**, with the code split into four layers
 ```text
 saunavuoro/
 ├── src/saunavuoro/
-│   ├── domain/
-│   ├── application/
-│   ├── api/
-│   └── infrastructure/
+│   ├── domain/           # entities, business rules, errors
+│   ├── application/      # use cases and ports (interfaces)
+│   ├── api/              # FastAPI app, routers, schemas, error mapping
+│   ├── infrastructure/   # database models, repositories, config
+│   └── main.py           # composition root
+├── migrations/           # Alembic migrations
+├── scripts/              # export_openapi.py
 ├── tests/
 │   ├── unit/
 │   └── integration/
 ├── docs/
 │   ├── adr/            # Architecture Decision Records
 │   ├── diagrams/
+│   ├── openapi.json    # exported API specification
 │   └── ai-usage.md     # AI usage log
 └── README.md
 ```
 
 ## Installation
 
-_TBD_
+```bash
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\Activate.ps1
+pip install -e ".[dev]"
+```
 
 ## Setup
 
-_TBD_ (database with Docker Compose, environment variables, migrations)
+```bash
+cp .env.example .env              # adjust DB_PORT / DATABASE_URL if port 5432 is taken
+docker compose up -d              # start PostgreSQL
+export $(grep -v '^#' .env | xargs)   # load the variables into the shell
+alembic upgrade head              # create the tables
+```
 
 ## Running the Application
 
-_TBD_
+```bash
+uvicorn saunavuoro.main:app --reload
+```
 
 ## API Access
 
-Once running, the interactive Swagger UI will be available at `http://localhost:8000/docs`.
+Once running:
+
+| URL                                   | Content                                  |
+| ------------------------------------- | ---------------------------------------- |
+| `http://localhost:8000/docs`          | Swagger UI – try the API in the browser  |
+| `http://localhost:8000/redoc`         | ReDoc – read-only API documentation      |
+| `http://localhost:8000/openapi.json`  | OpenAPI 3.1 specification                |
+
+A copy of the specification is stored in `docs/openapi.json`. Update it after changing the API:
+
+```bash
+python scripts/export_openapi.py
+```
 
 ## Running Tests
 
-_TBD_
+```bash
+pytest          # unit + integration tests (no database needed)
+mypy            # strict type checking
+```
 
 ## Documentation
 
