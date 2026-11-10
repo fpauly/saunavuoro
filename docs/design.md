@@ -40,7 +40,7 @@ Source code dependencies point **inward only**:
 | domain         | `domain/apartment.py`, `domain/errors.py`               | Entity and its rule (number not empty, max 20 chars)     |
 | application    | `application/ports.py`                                  | `ApartmentRepository` interface, `UnitOfWork`            |
 | application    | `application/use_cases/apartments.py`                   | Create, Get, List, Update, Delete (one class per use case) |
-| infrastructure | `infrastructure/persistence/models.py`                  | `ApartmentModel` (database table)                        |
+| infrastructure | `infrastructure/persistence/models.py`                  | `ApartmentModel` and the ORM models of all other tables  |
 | infrastructure | `infrastructure/persistence/apartment_repository.py`    | SQLAlchemy repository, converts model ↔ entity           |
 | infrastructure | `infrastructure/persistence/in_memory.py`               | In-memory repository for tests                           |
 | infrastructure | `infrastructure/persistence/unit_of_work.py`            | Transaction: commit or roll back                         |
@@ -49,6 +49,7 @@ Source code dependencies point **inward only**:
 | api            | `api/errors.py`                                         | Errors → HTTP status (404, 409, 422)                     |
 | api            | `api/schemas/errors.py`                                 | Error response models + `error_responses()` for OpenAPI  |
 | migrations     | `migrations/versions/0001_create_apartments.py`         | Creates the table                                        |
+| migrations     | `migrations/versions/0002_create_remaining_tables.py`   | Creates residents, saunas, weekly_turns, bookings        |
 
 ### Request flow: `POST /api/v1/apartments`
 
@@ -64,10 +65,10 @@ Example: adding `Sauna`.
 1. **Domain** – `domain/sauna.py`: the entity and its rules. Add new errors to `domain/errors.py`.
 2. **Port** – `application/ports.py`: add `SaunaRepository(Protocol)` and a `saunas` property in `UnitOfWork`.
 3. **Use cases** – `application/use_cases/saunas.py`: one class per use case.
-4. **ORM model** – `infrastructure/persistence/models.py`: add `SaunaModel`.
+4. **ORM model** – already in `infrastructure/persistence/models.py` (`SaunaModel`).
 5. **Repository** – `infrastructure/persistence/sauna_repository.py`; register it in `unit_of_work.py` (`self.saunas = ...`).
 6. **In-memory repository** – add `InMemorySaunaRepository` to `in_memory.py` and to `InMemoryUnitOfWork`.
-7. **Migration** – `alembic revision --autogenerate -m "create saunas table"` (database must be running), then check the generated file.
+7. **Migration** – all tables already exist (migration 0002). Only if you change a table: `alembic revision --autogenerate -m "..."` (database must be running), then check the generated file.
 8. **API** – `api/schemas/saunas.py`, `api/routers/saunas.py`, and include the router in `api/app.py`. Map new errors in `api/errors.py` if they need a status other than 422.
    - Give every endpoint a `summary=`, a docstring (shown as the description in Swagger UI) and `responses=error_responses(...)` listing the error codes it can return.
    - Add a `Field(description=..., examples=[...])` to schema fields.
