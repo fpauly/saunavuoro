@@ -58,23 +58,48 @@ Source code dependencies point **inward only**:
 3. The use case creates an `Apartment` (the domain checks the number), checks that the number is unique and saves it through the repository port, then commits.
 4. The router converts the entity to `ApartmentOut` and returns `201`. If an error is raised, `api/errors.py` turns it into `404`, `409` or `422`.
 
-## How to add a new feature (copy the Apartment example)
+## Shared foundation (already in place)
 
-Example: adding `Sauna`.
+Everything below exists for all features, so each feature only adds its own files:
 
-1. **Domain** – `domain/sauna.py`: the entity and its rules. Add new errors to `domain/errors.py`.
-2. **Port** – `application/ports.py`: add `SaunaRepository(Protocol)` and a `saunas` property in `UnitOfWork`.
-3. **Use cases** – `application/use_cases/saunas.py`: one class per use case.
-4. **ORM model** – already in `infrastructure/persistence/models.py` (`SaunaModel`).
-5. **Repository** – `infrastructure/persistence/sauna_repository.py`; register it in `unit_of_work.py` (`self.saunas = ...`).
-6. **In-memory repository** – add `InMemorySaunaRepository` to `in_memory.py` and to `InMemoryUnitOfWork`.
-7. **Migration** – all tables already exist (migration 0002). Only if you change a table: `alembic revision --autogenerate -m "..."` (database must be running), then check the generated file.
-8. **API** – `api/schemas/saunas.py`, `api/routers/saunas.py`, and include the router in `api/app.py`. Map new errors in `api/errors.py` if they need a status other than 422.
+| What                         | Where                                                                 |
+| ---------------------------- | --------------------------------------------------------------------- |
+| Entities (fields only)       | `domain/resident.py`, `domain/weekly_turn.py`, `domain/booking.py`    |
+| Sauna + time grid            | `domain/sauna.py`: `turn_start_times()`, `is_turn_start()`, `turn_end()` |
+| Repository ports, `Clock`    | `application/ports.py`                                                |
+| SQL repositories             | `infrastructure/persistence/*_repository.py`, all in `unit_of_work.py` |
+| In-memory repositories       | `infrastructure/persistence/in_memory.py`                             |
+| Clock                        | `infrastructure/clock.py`: `SystemClock` (Europe/Helsinki), `FixedClock` for tests |
+| Empty routers                | `api/routers/{residents,saunas,weekly_turns,bookings}.py`, included in `api/app.py` |
+
+Errors:
+
+| Raise                                   | Layer       | HTTP |
+| --------------------------------------- | ----------- | ---- |
+| `RuleViolationError("...")`             | domain      | 422  |
+| `NotFoundError(resource, id)`           | application | 404  |
+| `ConflictError("...")`, `AlreadyExistsError` | application | 409  |
+
+A database constraint error on `commit()` (for example two bookings of the same turn, or deleting
+a sauna that still has bookings) is turned into `ConflictError` by the unit of work.
+
+Times: `Clock.now()` returns an aware datetime in Europe/Helsinki. Use cases get the clock as a
+constructor argument; routers get it with the `CurrentClock` dependency. Bookings are stored as UTC.
+
+## How to add a feature (copy the Apartment example)
+
+Example: `Sauna`.
+
+1. **Domain** – add the rules to the entity (`domain/sauna.py`). Raise `RuleViolationError`.
+2. **Use cases** – `application/use_cases/saunas.py`: one class per use case.
+3. **API** – `api/schemas/saunas.py`, and the endpoints in `api/routers/saunas.py`.
    - Give every endpoint a `summary=`, a docstring (shown as the description in Swagger UI) and `responses=error_responses(...)` listing the error codes it can return.
    - Add a `Field(description=..., examples=[...])` to schema fields.
-   - Add the new tag to `TAGS` in `api/app.py`.
-9. **Tests** – `tests/unit/domain/`, `tests/unit/application/`, `tests/integration/`.
-10. Run `python scripts/export_openapi.py` to update `docs/openapi.json`, then `pytest` and `mypy` before committing.
+4. **Tests** – `tests/unit/domain/`, `tests/unit/application/`, `tests/integration/`.
+5. If a repository method is missing, add it to the port in `application/ports.py`, the SQL
+   repository and the in-memory repository.
+6. Only if you change a table: `alembic revision --autogenerate -m "..."` (database must be running), then check the generated file.
+7. Run `python scripts/export_openapi.py` to update `docs/openapi.json`, then `pytest` and `mypy` before committing.
 
 ## API documentation (OpenAPI)
 

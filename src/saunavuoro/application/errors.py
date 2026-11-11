@@ -12,5 +12,9 @@ class NotFoundError(ApplicationError):
         super().__init__(f"{resource} {resource_id} was not found.")
 
 
-class AlreadyExistsError(ApplicationError):
+class ConflictError(ApplicationError):
+    pass
+
+
+class AlreadyExistsError(ConflictError):
     """A resource with the same unique value already exists."""

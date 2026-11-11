@@ -418,6 +418,22 @@
     {
       "name": "apartments",
       "description": "Apartments of the building (administrator)."
+    },
+    {
+      "name": "residents",
+      "description": "Residents living in the apartments."
+    },
+    {
+      "name": "saunas",
+      "description": "Saunas, opening hours and booking rules (administrator)."
+    },
+    {
+      "name": "weekly-turns",
+      "description": "Fixed weekly sauna turns of the apartments."
+    },
+    {
+      "name": "bookings",
+      "description": "One-off bookings of free sauna turns."
     }
   ]
 }
