@@ -4,19 +4,20 @@ import json
 from pathlib import Path
 
 from saunavuoro.api.app import create_app
+from saunavuoro.infrastructure.clock import SystemClock
 from saunavuoro.infrastructure.persistence.in_memory import InMemoryUnitOfWork
 
 EXPORTED = Path(__file__).resolve().parents[2] / "docs" / "openapi.json"
 
 
 def test_error_responses_are_documented() -> None:
-    spec = create_app(uow_factory=InMemoryUnitOfWork).openapi()
+    spec = create_app(uow_factory=InMemoryUnitOfWork, clock=SystemClock()).openapi()
     post = spec["paths"]["/api/v1/apartments"]["post"]
     assert {"201", "409", "422"} <= set(post["responses"])
 
 
 def test_exported_openapi_is_up_to_date() -> None:
-    spec = create_app(uow_factory=InMemoryUnitOfWork).openapi()
+    spec = create_app(uow_factory=InMemoryUnitOfWork, clock=SystemClock()).openapi()
     assert json.loads(EXPORTED.read_text(encoding="utf-8")) == spec, (
         "docs/openapi.json is outdated. Run: python scripts/export_openapi.py"
     )

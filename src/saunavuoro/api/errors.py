@@ -4,12 +4,18 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
 from saunavuoro.api.schemas.errors import ErrorResponse
-from saunavuoro.application.errors import AlreadyExistsError, ApplicationError, NotFoundError
+from saunavuoro.application.errors import (
+    AlreadyExistsError,
+    ApplicationError,
+    ConflictError,
+    NotFoundError,
+)
 from saunavuoro.domain.errors import DomainError
 
 _STATUS_BY_ERROR: dict[type[Exception], int] = {
     NotFoundError: status.HTTP_404_NOT_FOUND,
     AlreadyExistsError: status.HTTP_409_CONFLICT,
+    ConflictError: status.HTTP_409_CONFLICT,
 }
 
 

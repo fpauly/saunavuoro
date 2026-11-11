@@ -7,3 +7,7 @@ class DomainError(Exception):
 
 class InvalidApartmentNumberError(DomainError):
     """The apartment number is empty or too long."""
+
+
+class RuleViolationError(DomainError):
+    pass

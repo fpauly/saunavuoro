@@ -3,6 +3,7 @@
 from fastapi.testclient import TestClient
 
 from saunavuoro.api.app import create_app
+from saunavuoro.infrastructure.clock import SystemClock
 from saunavuoro.infrastructure.persistence.in_memory import InMemoryUnitOfWork
 
 URL = "/api/v1/apartments"
@@ -10,7 +11,7 @@ URL = "/api/v1/apartments"
 
 def make_client() -> TestClient:
     uow = InMemoryUnitOfWork()
-    return TestClient(create_app(uow_factory=lambda: uow))
+    return TestClient(create_app(uow_factory=lambda: uow, clock=SystemClock()))
 
 
 def test_crud_flow() -> None:
