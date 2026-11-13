@@ -1,29 +1,30 @@
-"""FastAPI dependencies (the composition root for adapters)."""
+"""Dependency Injection for the routers.
 
-from __future__ import annotations
+The composition root (main.py) decides which UnitOfWork is used;
+the API layer only knows the UnitOfWork interface.
+"""
 
-from collections.abc import Iterator
-from functools import lru_cache
+from collections.abc import Callable
 from typing import Annotated
 
-from fastapi import Depends
-from sqlalchemy.orm import Session
+from fastapi import Depends, Request
 
-from saunavuoro.infrastructure.config import get_settings
-from saunavuoro.infrastructure.database import Database
+from saunavuoro.application.ports import Clock, UnitOfWork
 
-
-@lru_cache
-def get_database() -> Database:
-    return Database(get_settings().database_url)
+UnitOfWorkFactory = Callable[[], UnitOfWork]
 
 
-def get_session(
-    database: Annotated[Database, Depends(get_database)],
-) -> Iterator[Session]:
-    with database.session() as session:
-        yield session
+def get_uow(request: Request) -> UnitOfWork:
+    factory: UnitOfWorkFactory = request.app.state.uow_factory
+    return factory()
 
 
-DatabaseDep = Annotated[Database, Depends(get_database)]
-SessionDep = Annotated[Session, Depends(get_session)]
+Uow = Annotated[UnitOfWork, Depends(get_uow)]
+
+
+def get_clock(request: Request) -> Clock:
+    clock: Clock = request.app.state.clock
+    return clock
+
+
+CurrentClock = Annotated[Clock, Depends(get_clock)]

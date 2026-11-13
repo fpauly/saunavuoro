@@ -1,80 +1,78 @@
-"""REST endpoints for resident administration."""
+"""/residents endpoints. Routers only convert data and call use cases (no business logic).
 
-from __future__ import annotations
+The docstring of each endpoint is shown as its description in Swagger UI.
+"""
 
-from fastapi import APIRouter, Query, Response, status
+from typing import Annotated
+from uuid import UUID
 
-from saunavuoro.api.dependencies import SessionDep
-from saunavuoro.api.schemas import ResidentCreate, ResidentResponse, ResidentUpdate
-from saunavuoro.application.residents import (
+from fastapi import APIRouter, Query, status
+
+from saunavuoro.api.dependencies import Uow
+from saunavuoro.api.schemas.errors import error_responses
+from saunavuoro.api.schemas.residents import ResidentIn, ResidentOut
+from saunavuoro.application.use_cases.residents import (
     CreateResident,
     DeleteResident,
     GetResident,
     ListResidents,
     UpdateResident,
 )
-from saunavuoro.infrastructure.repositories import (
-    SqlAlchemyApartmentRepository,
-    SqlAlchemyResidentRepository,
-)
 
 router = APIRouter(prefix="/residents", tags=["residents"])
 
 
-@router.post("", status_code=status.HTTP_201_CREATED, response_model=ResidentResponse)
-def create_resident(payload: ResidentCreate, session: SessionDep) -> ResidentResponse:
-    resident = CreateResident(
-        SqlAlchemyResidentRepository(session),
-        SqlAlchemyApartmentRepository(session),
-    ).execute(
-        first_name=payload.first_name,
-        last_name=payload.last_name,
-        email=payload.email,
-        apartment_id=payload.apartment_id,
-        phone=payload.phone,
-    )
-    session.commit()
-    return ResidentResponse.model_validate(resident)
+@router.post(
+    "",
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a resident",
+    responses=error_responses(404, 422),
+)
+def create_resident(body: ResidentIn, uow: Uow) -> ResidentOut:
+    """Add a resident to an existing apartment."""
+    resident = CreateResident(uow).execute(body.apartment_id, body.name)
+    return ResidentOut.from_entity(resident)
 
 
-@router.get("", response_model=list[ResidentResponse])
+@router.get("", summary="List residents")
 def list_residents(
-    session: SessionDep,
-    apartment_id: int | None = Query(default=None, ge=1),
-) -> list[ResidentResponse]:
-    residents = ListResidents(SqlAlchemyResidentRepository(session)).execute(apartment_id)
-    return [ResidentResponse.model_validate(resident) for resident in residents]
+    uow: Uow,
+    apartment_id: Annotated[
+        UUID | None,
+        Query(description="Return only the residents of this apartment."),
+    ] = None,
+) -> list[ResidentOut]:
+    """Return all residents, or the residents of one apartment."""
+    return [ResidentOut.from_entity(r) for r in ListResidents(uow).execute(apartment_id)]
 
 
-@router.get("/{resident_id}", response_model=ResidentResponse)
-def get_resident(resident_id: int, session: SessionDep) -> ResidentResponse:
-    resident = GetResident(SqlAlchemyResidentRepository(session)).execute(resident_id)
-    return ResidentResponse.model_validate(resident)
+@router.get(
+    "/{resident_id}",
+    summary="Get a resident",
+    responses=error_responses(404, 422),
+)
+def get_resident(resident_id: UUID, uow: Uow) -> ResidentOut:
+    """Return one resident by id."""
+    return ResidentOut.from_entity(GetResident(uow).execute(resident_id))
 
 
-@router.put("/{resident_id}", response_model=ResidentResponse)
-def update_resident(
-    resident_id: int,
-    payload: ResidentUpdate,
-    session: SessionDep,
-) -> ResidentResponse:
-    resident = UpdateResident(
-        SqlAlchemyResidentRepository(session),
-        SqlAlchemyApartmentRepository(session),
-    ).execute(
-        resident_id,
-        first_name=payload.first_name,
-        last_name=payload.last_name,
-        email=payload.email,
-        apartment_id=payload.apartment_id,
-        phone=payload.phone,
-    )
-    session.commit()
-    return ResidentResponse.model_validate(resident)
+@router.put(
+    "/{resident_id}",
+    summary="Update a resident",
+    responses=error_responses(404, 422),
+)
+def update_resident(resident_id: UUID, body: ResidentIn, uow: Uow) -> ResidentOut:
+    """Change the resident's name or move them to another apartment."""
+    resident = UpdateResident(uow).execute(resident_id, body.apartment_id, body.name)
+    return ResidentOut.from_entity(resident)
 
 
-@router.delete("/{resident_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_resident(resident_id: int, session: SessionDep) -> Response:
-    DeleteResident(SqlAlchemyResidentRepository(session)).execute(resident_id)
-    session.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{resident_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a resident",
+    responses=error_responses(404, 422),
+)
+def delete_resident(resident_id: UUID, uow: Uow) -> None:
+    """Remove a resident from the building."""
+    DeleteResident(uow).execute(resident_id)

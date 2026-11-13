@@ -1,68 +1,69 @@
-"""REST endpoints for apartment administration."""
+"""/apartments endpoints. Routers only convert data and call use cases (no business logic).
 
-from __future__ import annotations
+The docstring of each endpoint is shown as its description in Swagger UI.
+"""
 
-from fastapi import APIRouter, Response, status
+from uuid import UUID
 
-from saunavuoro.api.dependencies import SessionDep
-from saunavuoro.api.schemas import ApartmentCreate, ApartmentResponse, ApartmentUpdate
-from saunavuoro.application.apartments import (
+from fastapi import APIRouter, status
+
+from saunavuoro.api.dependencies import Uow
+from saunavuoro.api.schemas.apartments import ApartmentIn, ApartmentOut
+from saunavuoro.api.schemas.errors import error_responses
+from saunavuoro.application.use_cases.apartments import (
     CreateApartment,
     DeleteApartment,
     GetApartment,
     ListApartments,
     UpdateApartment,
 )
-from saunavuoro.infrastructure.repositories import (
-    SqlAlchemyApartmentRepository,
-    SqlAlchemyResidentRepository,
-)
 
 router = APIRouter(prefix="/apartments", tags=["apartments"])
 
 
-@router.post("", status_code=status.HTTP_201_CREATED, response_model=ApartmentResponse)
-def create_apartment(payload: ApartmentCreate, session: SessionDep) -> ApartmentResponse:
-    apartment = CreateApartment(SqlAlchemyApartmentRepository(session)).execute(
-        number=payload.number,
-        floor=payload.floor,
-    )
-    session.commit()
-    return ApartmentResponse.model_validate(apartment)
+@router.post(
+    "",
+    status_code=status.HTTP_201_CREATED,
+    summary="Create an apartment",
+    responses=error_responses(409, 422),
+)
+def create_apartment(body: ApartmentIn, uow: Uow) -> ApartmentOut:
+    """Add a new apartment to the building. Apartment numbers must be unique."""
+    return ApartmentOut.from_entity(CreateApartment(uow).execute(body.number))
 
 
-@router.get("", response_model=list[ApartmentResponse])
-def list_apartments(session: SessionDep) -> list[ApartmentResponse]:
-    apartments = ListApartments(SqlAlchemyApartmentRepository(session)).execute()
-    return [ApartmentResponse.model_validate(apartment) for apartment in apartments]
+@router.get("", summary="List apartments")
+def list_apartments(uow: Uow) -> list[ApartmentOut]:
+    """Return all apartments, sorted by number."""
+    return [ApartmentOut.from_entity(a) for a in ListApartments(uow).execute()]
 
 
-@router.get("/{apartment_id}", response_model=ApartmentResponse)
-def get_apartment(apartment_id: int, session: SessionDep) -> ApartmentResponse:
-    apartment = GetApartment(SqlAlchemyApartmentRepository(session)).execute(apartment_id)
-    return ApartmentResponse.model_validate(apartment)
+@router.get(
+    "/{apartment_id}",
+    summary="Get an apartment",
+    responses=error_responses(404, 422),
+)
+def get_apartment(apartment_id: UUID, uow: Uow) -> ApartmentOut:
+    """Return one apartment by its id."""
+    return ApartmentOut.from_entity(GetApartment(uow).execute(apartment_id))
 
 
-@router.put("/{apartment_id}", response_model=ApartmentResponse)
-def update_apartment(
-    apartment_id: int,
-    payload: ApartmentUpdate,
-    session: SessionDep,
-) -> ApartmentResponse:
-    apartment = UpdateApartment(SqlAlchemyApartmentRepository(session)).execute(
-        apartment_id,
-        number=payload.number,
-        floor=payload.floor,
-    )
-    session.commit()
-    return ApartmentResponse.model_validate(apartment)
+@router.put(
+    "/{apartment_id}",
+    summary="Update an apartment",
+    responses=error_responses(404, 409, 422),
+)
+def update_apartment(apartment_id: UUID, body: ApartmentIn, uow: Uow) -> ApartmentOut:
+    """Change the apartment number. The new number must not belong to another apartment."""
+    return ApartmentOut.from_entity(UpdateApartment(uow).execute(apartment_id, body.number))
 
 
-@router.delete("/{apartment_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_apartment(apartment_id: int, session: SessionDep) -> Response:
-    DeleteApartment(
-        SqlAlchemyApartmentRepository(session),
-        SqlAlchemyResidentRepository(session),
-    ).execute(apartment_id)
-    session.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{apartment_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete an apartment",
+    responses=error_responses(404, 422),
+)
+def delete_apartment(apartment_id: UUID, uow: Uow) -> None:
+    """Remove an apartment from the building."""
+    DeleteApartment(uow).execute(apartment_id)

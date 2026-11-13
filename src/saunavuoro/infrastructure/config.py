@@ -1,28 +1,13 @@
-"""Application configuration loaded from environment variables and .env."""
+import os
+from dataclasses import dataclass
 
-from __future__ import annotations
-
-from functools import lru_cache
-from typing import Literal
-
-from pydantic_settings import BaseSettings, SettingsConfigDict
+DEFAULT_DATABASE_URL = "postgresql+psycopg://saunavuoro:saunavuoro@localhost:5432/saunavuoro"
 
 
-class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        extra="ignore",
-        case_sensitive=False,
-    )
-
-    app_name: str = "SaunaVuoro"
-    environment: Literal["development", "test", "production"] = "development"
-    log_level: str = "info"
-    api_prefix: str = "/api/v1"
-    database_url: str = "postgresql+psycopg://saunavuoro:saunavuoro@localhost:5434/saunavuoro"
+@dataclass(frozen=True)
+class Settings:
+    database_url: str
 
 
-@lru_cache
-def get_settings() -> Settings:
-    return Settings()
+def load_settings() -> Settings:
+    return Settings(database_url=os.environ.get("DATABASE_URL", DEFAULT_DATABASE_URL))
