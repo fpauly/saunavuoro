@@ -2,28 +2,12 @@
 
 A backend application for booking sauna turns in a Finnish apartment building, built for the Software Architecture course (autumn 2026).
 
-> **Status:** Early development. Sections marked _TBD_ will be completed as the project progresses.
-
-## Project Overview
-
-Many Finnish apartment buildings have a shared sauna that residents use in turns (_saunavuoro_). Each apartment can have a weekly fixed turn, and free hours can be booked separately.
-
-SaunaVuoro provides a REST API for managing apartments, residents, saunas, weekly turns and one-off bookings. The application enforces the building's booking rules, such as preventing overlapping turns and limiting the number of bookings per week.
-
-The project follows **Clean Architecture**, with the code split into four layers:
-
-| Layer          | Folder                          | Responsibility                              |
-| -------------- | ------------------------------- | ------------------------------------------- |
-| Domain         | `src/saunavuoro/domain`         | Entities, value objects and business rules  |
-| Application    | `src/saunavuoro/application`    | Use cases and interfaces (ports)            |
-| API            | `src/saunavuoro/api`            | REST endpoints and request/response models  |
-| Infrastructure | `src/saunavuoro/infrastructure` | Database access and other external concerns |
+SaunaVuoro provides a REST API for managing apartments, residents, saunas, weekly turns and one-off bookings. The current milestone implements administrator CRUD for apartments, residents and saunas.
 
 ## Technology
 
-- Python 3.12, FastAPI
+- Python 3.12+ (tested on Python 3.14), FastAPI
 - PostgreSQL, SQLAlchemy, Alembic
-- pytest, mypy (strict)
 - Docker Compose (database)
 
 ## Repository Structure
@@ -31,45 +15,62 @@ The project follows **Clean Architecture**, with the code split into four layers
 ```text
 saunavuoro/
 ├── src/saunavuoro/
-│   ├── domain/
-│   ├── application/
-│   ├── api/
-│   └── infrastructure/
-├── tests/
-│   ├── unit/
-│   └── integration/
-├── docs/
-│   ├── adr/            # Architecture Decision Records
-│   ├── diagrams/
-│   └── ai-usage.md     # AI usage log
-└── README.md
+│   ├── domain/           # Entities and business rules
+│   ├── application/      # Use cases and repository interfaces
+│   ├── api/              # FastAPI app, routers and schemas
+│   └── infrastructure/   # Settings, database models and repositories
+├── migrations/           # Alembic migrations
+├── compose.yaml          # PostgreSQL for local development
+├── alembic.ini
+└── pyproject.toml
 ```
 
 ## Installation
 
-_TBD_
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
+Copy-Item .env.example .env
+```
 
 ## Setup
 
-_TBD_ (database with Docker Compose, environment variables, migrations)
+Start PostgreSQL and apply the migration:
+
+```powershell
+docker compose up -d db
+.\.venv\Scripts\alembic.exe upgrade head
+```
+
+The database listens on host port **5434** to avoid clashing with other local PostgreSQL instances. Credentials and the connection URL are in `compose.yaml` and `.env.example`.
 
 ## Running the Application
 
-_TBD_
+```powershell
+.\.venv\Scripts\uvicorn.exe saunavuoro.api.main:app --reload
+```
 
-## API Access
+- Swagger UI: <http://localhost:8000/docs>
+- Health check: <http://localhost:8000/health>
 
-Once running, the interactive Swagger UI will be available at `http://localhost:8000/docs`.
+## API
 
-## Running Tests
+All endpoints are under `/api/v1`.
 
-_TBD_
+| Resource   | Endpoints                                                                 |
+| ---------- | ------------------------------------------------------------------------- |
+| Apartments | `POST/GET /apartments`, `GET/PUT/DELETE /apartments/{id}`                 |
+| Residents  | `POST/GET /residents` (`?apartment_id=` filter), `GET/PUT/DELETE /residents/{id}` |
+| Saunas     | `POST/GET /saunas`, `GET/PUT/DELETE /saunas/{id}`                         |
 
-## Documentation
+Rules:
 
-- Architecture and design: `docs/design.md`
-- Architecture decisions: `docs/adr/`
-- AI usage: `docs/ai-usage.md`
+- Apartment numbers, resident emails and sauna names are unique.
+- A resident must belong to an existing apartment.
+- An apartment with residents cannot be deleted (`409`).
+- Missing resources return `404`; invalid input returns `422`.
 
 ## Assumptions
 
@@ -79,9 +80,9 @@ _TBD_
 
 ## Limitations
 
-- Backend only; no frontend. Swagger UI is used for testing and demonstration.
-- No authentication or authorisation.
-- No payments or notifications.
+- Backend only; no frontend.
+- No authentication or authorisation; admin endpoints are open in this course scope.
+- Weekly turns and one-off bookings are not implemented yet.
 
 ## Team
 
