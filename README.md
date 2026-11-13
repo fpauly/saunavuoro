@@ -2,7 +2,7 @@
 
 A backend application for booking sauna turns in a Finnish apartment building, built for the Software Architecture course (autumn 2026).
 
-> **Status:** Early development. The architecture skeleton is in place, with `Apartment` CRUD implemented as the example feature.
+> **Status:** Early development. The architecture skeleton is in place, with administrator CRUD for apartments, residents and saunas implemented.
 
 ## Project Overview
 
@@ -23,7 +23,7 @@ The project follows **Clean Architecture**, with the code split into four layers
 
 - Python 3.12, FastAPI
 - PostgreSQL, SQLAlchemy, Alembic
-- pytest, mypy (strict)
+- pytest, mypy (strict), ruff
 - Docker Compose (database)
 
 ## Repository Structure
@@ -82,6 +82,20 @@ Once running:
 | `http://localhost:8000/redoc`         | ReDoc – read-only API documentation      |
 | `http://localhost:8000/openapi.json`  | OpenAPI 3.1 specification                |
 
+All endpoints are under `/api/v1`.
+
+| Resource   | Endpoints                                                                 |
+| ---------- | ------------------------------------------------------------------------- |
+| Apartments | `POST/GET /apartments`, `GET/PUT/DELETE /apartments/{id}`                 |
+| Residents  | `POST/GET /residents` (`?apartment_id=` filter), `GET/PUT/DELETE /residents/{id}` |
+| Saunas     | `POST/GET /saunas`, `GET/PUT/DELETE /saunas/{id}`                         |
+
+Rules:
+
+- Apartment numbers are unique.
+- A resident must belong to an existing apartment.
+- Missing resources return `404`; invalid input returns `422`; conflicting data returns `409`.
+
 A copy of the specification is stored in `docs/openapi.json`. Update it after changing the API:
 
 ```bash
@@ -112,6 +126,7 @@ mypy            # strict type checking
 - Backend only; no frontend. Swagger UI is used for testing and demonstration.
 - No authentication or authorisation.
 - No payments or notifications.
+- Weekly turns and one-off bookings are not implemented yet.
 
 ## Team
 

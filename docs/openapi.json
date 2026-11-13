@@ -284,6 +284,575 @@
           }
         }
       }
+    },
+    "/api/v1/residents": {
+      "post": {
+        "tags": [
+          "residents"
+        ],
+        "summary": "Create a resident",
+        "description": "Add a resident to an existing apartment.",
+        "operationId": "create_resident_api_v1_residents_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResidentIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResidentOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request data, or a business rule was broken.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorResponse"
+                    }
+                  ],
+                  "title": "Response 422 Create Resident Api V1 Residents Post"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "residents"
+        ],
+        "summary": "List residents",
+        "description": "Return all residents, or the residents of one apartment.",
+        "operationId": "list_residents_api_v1_residents_get",
+        "parameters": [
+          {
+            "name": "apartment_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Return only the residents of this apartment.",
+              "title": "Apartment Id"
+            },
+            "description": "Return only the residents of this apartment."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResidentOut"
+                  },
+                  "title": "Response List Residents Api V1 Residents Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/residents/{resident_id}": {
+      "get": {
+        "tags": [
+          "residents"
+        ],
+        "summary": "Get a resident",
+        "description": "Return one resident by id.",
+        "operationId": "get_resident_api_v1_residents__resident_id__get",
+        "parameters": [
+          {
+            "name": "resident_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resident Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResidentOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request data, or a business rule was broken.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorResponse"
+                    }
+                  ],
+                  "title": "Response 422 Get Resident Api V1 Residents  Resident Id  Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "residents"
+        ],
+        "summary": "Update a resident",
+        "description": "Change the resident's name or move them to another apartment.",
+        "operationId": "update_resident_api_v1_residents__resident_id__put",
+        "parameters": [
+          {
+            "name": "resident_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resident Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResidentIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResidentOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request data, or a business rule was broken.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorResponse"
+                    }
+                  ],
+                  "title": "Response 422 Update Resident Api V1 Residents  Resident Id  Put"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "residents"
+        ],
+        "summary": "Delete a resident",
+        "description": "Remove a resident from the building.",
+        "operationId": "delete_resident_api_v1_residents__resident_id__delete",
+        "parameters": [
+          {
+            "name": "resident_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resident Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "The resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request data, or a business rule was broken.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorResponse"
+                    }
+                  ],
+                  "title": "Response 422 Delete Resident Api V1 Residents  Resident Id  Delete"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/saunas": {
+      "get": {
+        "tags": [
+          "saunas"
+        ],
+        "summary": "List saunas",
+        "description": "Return all saunas, sorted by name.",
+        "operationId": "list_saunas_api_v1_saunas_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SaunaOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Saunas Api V1 Saunas Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "saunas"
+        ],
+        "summary": "Create a sauna",
+        "description": "Add a new sauna with its opening hours and booking rules.",
+        "operationId": "create_sauna_api_v1_saunas_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaunaIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaunaOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request data, or a business rule was broken.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorResponse"
+                    }
+                  ],
+                  "title": "Response 422 Create Sauna Api V1 Saunas Post"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/saunas/{sauna_id}": {
+      "get": {
+        "tags": [
+          "saunas"
+        ],
+        "summary": "Get a sauna",
+        "description": "Return one sauna by id.",
+        "operationId": "get_sauna_api_v1_saunas__sauna_id__get",
+        "parameters": [
+          {
+            "name": "sauna_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Sauna Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaunaOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request data, or a business rule was broken.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorResponse"
+                    }
+                  ],
+                  "title": "Response 422 Get Sauna Api V1 Saunas  Sauna Id  Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "saunas"
+        ],
+        "summary": "Update a sauna",
+        "description": "Change the sauna's name, opening hours or booking rules.",
+        "operationId": "update_sauna_api_v1_saunas__sauna_id__put",
+        "parameters": [
+          {
+            "name": "sauna_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Sauna Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaunaIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaunaOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request data, or a business rule was broken.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorResponse"
+                    }
+                  ],
+                  "title": "Response 422 Update Sauna Api V1 Saunas  Sauna Id  Put"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "saunas"
+        ],
+        "summary": "Delete a sauna",
+        "description": "Remove a sauna. A sauna with weekly turns or bookings cannot be deleted.",
+        "operationId": "delete_sauna_api_v1_saunas__sauna_id__delete",
+        "parameters": [
+          {
+            "name": "sauna_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Sauna Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "The resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicts with existing data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request data, or a business rule was broken.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorResponse"
+                    }
+                  ],
+                  "title": "Response 422 Delete Sauna Api V1 Saunas  Sauna Id  Delete"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -349,6 +918,285 @@
         ],
         "title": "ErrorResponse",
         "description": "Returned when a use case or a business rule rejects the request."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ResidentIn": {
+        "properties": {
+          "apartment_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Apartment Id",
+            "description": "Apartment the resident lives in."
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name",
+            "description": "Full name of the resident.",
+            "examples": [
+              "Maija Virtanen"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "apartment_id",
+          "name"
+        ],
+        "title": "ResidentIn",
+        "description": "Data for creating or updating a resident."
+      },
+      "ResidentOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Unique identifier of the resident."
+          },
+          "apartment_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Apartment Id",
+            "description": "Apartment the resident lives in."
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Full name of the resident.",
+            "examples": [
+              "Maija Virtanen"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "apartment_id",
+          "name"
+        ],
+        "title": "ResidentOut",
+        "description": "A resident of the building."
+      },
+      "SaunaIn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name",
+            "description": "Name of the sauna.",
+            "examples": [
+              "Lower sauna"
+            ]
+          },
+          "opens_at": {
+            "type": "string",
+            "format": "time",
+            "title": "Opens At",
+            "description": "Opening time of the sauna.",
+            "examples": [
+              "17:00"
+            ]
+          },
+          "closes_at": {
+            "type": "string",
+            "format": "time",
+            "title": "Closes At",
+            "description": "Closing time of the sauna.",
+            "examples": [
+              "22:00"
+            ]
+          },
+          "turn_length_minutes": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Turn Length Minutes",
+            "description": "Length of one sauna turn in minutes.",
+            "default": 60,
+            "examples": [
+              60
+            ]
+          },
+          "max_extra_bookings_per_week": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Max Extra Bookings Per Week",
+            "description": "How many extra one-off bookings an apartment may make per week.",
+            "default": 1,
+            "examples": [
+              1
+            ]
+          },
+          "max_days_ahead": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Max Days Ahead",
+            "description": "How many days ahead bookings can be made.",
+            "default": 14,
+            "examples": [
+              14
+            ]
+          },
+          "cancellation_deadline_hours": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Cancellation Deadline Hours",
+            "description": "How many hours before a turn a booking can be cancelled.",
+            "default": 2,
+            "examples": [
+              2
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "opens_at",
+          "closes_at"
+        ],
+        "title": "SaunaIn",
+        "description": "Data for creating or updating a sauna."
+      },
+      "SaunaOut": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name",
+            "description": "Name of the sauna.",
+            "examples": [
+              "Lower sauna"
+            ]
+          },
+          "opens_at": {
+            "type": "string",
+            "format": "time",
+            "title": "Opens At",
+            "description": "Opening time of the sauna.",
+            "examples": [
+              "17:00"
+            ]
+          },
+          "closes_at": {
+            "type": "string",
+            "format": "time",
+            "title": "Closes At",
+            "description": "Closing time of the sauna.",
+            "examples": [
+              "22:00"
+            ]
+          },
+          "turn_length_minutes": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Turn Length Minutes",
+            "description": "Length of one sauna turn in minutes.",
+            "default": 60,
+            "examples": [
+              60
+            ]
+          },
+          "max_extra_bookings_per_week": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Max Extra Bookings Per Week",
+            "description": "How many extra one-off bookings an apartment may make per week.",
+            "default": 1,
+            "examples": [
+              1
+            ]
+          },
+          "max_days_ahead": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Max Days Ahead",
+            "description": "How many days ahead bookings can be made.",
+            "default": 14,
+            "examples": [
+              14
+            ]
+          },
+          "cancellation_deadline_hours": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Cancellation Deadline Hours",
+            "description": "How many hours before a turn a booking can be cancelled.",
+            "default": 2,
+            "examples": [
+              2
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Unique identifier of the sauna."
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "opens_at",
+          "closes_at",
+          "id"
+        ],
+        "title": "SaunaOut",
+        "description": "A sauna of the building."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
       },
       "ValidationErrorResponse": {
         "properties": {
