@@ -1,10 +1,9 @@
 from fastapi import FastAPI
 
-from saunavuoro.application.ports import Clock
-
 from saunavuoro.api.dependencies import UnitOfWorkFactory
 from saunavuoro.api.errors import register_error_handlers
 from saunavuoro.api.routers import apartments, bookings, residents, saunas, weekly_turns
+from saunavuoro.application.ports import Clock
 
 DESCRIPTION = """
 REST API for booking sauna turns in a Finnish apartment building.

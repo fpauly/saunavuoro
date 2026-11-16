@@ -24,6 +24,10 @@ class SqlAlchemyResidentRepository:
         row = self._session.get(ResidentModel, resident_id)
         return _to_entity(row) if row else None
 
+    def list_all(self) -> list[Resident]:
+        rows = self._session.scalars(select(ResidentModel).order_by(ResidentModel.name))
+        return [_to_entity(row) for row in rows]
+
     def list_by_apartment(self, apartment_id: UUID) -> list[Resident]:
         rows = self._session.scalars(
             select(ResidentModel)

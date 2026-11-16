@@ -45,6 +45,9 @@ class InMemoryResidentRepository:
     def get(self, resident_id: UUID) -> Resident | None:
         return self.items.get(resident_id)
 
+    def list_all(self) -> list[Resident]:
+        return sorted(self.items.values(), key=lambda r: r.name)
+
     def list_by_apartment(self, apartment_id: UUID) -> list[Resident]:
         found = [r for r in self.items.values() if r.apartment_id == apartment_id]
         return sorted(found, key=lambda r: r.name)
