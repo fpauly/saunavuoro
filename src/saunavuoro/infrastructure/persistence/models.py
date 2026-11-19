@@ -37,7 +37,17 @@ class ResidentModel(Base):
 
 class SaunaModel(Base):
     __tablename__ = "saunas"
-    __table_args__ = (CheckConstraint("closes_at > opens_at", name="ck_saunas_opening_hours"),)
+    __table_args__ = (
+        CheckConstraint("closes_at > opens_at", name="ck_saunas_opening_hours"),
+        CheckConstraint("turn_length_minutes > 0", name="ck_saunas_turn_length"),
+        CheckConstraint(
+            "max_extra_bookings_per_week >= 0", name="ck_saunas_max_extra_bookings"
+        ),
+        CheckConstraint("max_days_ahead >= 0", name="ck_saunas_max_days_ahead"),
+        CheckConstraint(
+            "cancellation_deadline_hours >= 0", name="ck_saunas_cancellation_deadline"
+        ),
+    )
 
     id: Mapped[UUID] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(100))

@@ -27,10 +27,22 @@ def test_turn_end() -> None:
         {"closes_at": time(17)},
         {"turn_length_minutes": 0},
         {"turn_length_minutes": 300},
+        {"max_extra_bookings_per_week": -1},
         {"max_days_ahead": -1},
+        {"cancellation_deadline_hours": -1},
     ],
 )
 def test_invalid_sauna(kwargs: dict[str, object]) -> None:
     data: dict[str, object] = {"name": "A", "opens_at": time(17), "closes_at": time(21)} | kwargs
     with pytest.raises(RuleViolationError):
         Sauna(**data)  # type: ignore[arg-type]
+
+
+def test_invalid_booking_rule_error_names_the_rule() -> None:
+    with pytest.raises(RuleViolationError, match="Maximum extra bookings per week"):
+        Sauna(
+            name="A",
+            opens_at=time(17),
+            closes_at=time(21),
+            max_extra_bookings_per_week=-1,
+        )
