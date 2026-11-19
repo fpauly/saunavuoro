@@ -60,9 +60,9 @@ pip install -e ".[dev]"
 ## Setup
 
 ```bash
+# On Powershell, use `Copy-Item .env.example .env` instead of `cp`.
 cp .env.example .env              # adjust DB_PORT / DATABASE_URL if port 5432 is taken
 docker compose up -d              # start PostgreSQL
-export $(grep -v '^#' .env | xargs)   # load the variables into the shell
 alembic upgrade head              # create the tables
 ```
 
