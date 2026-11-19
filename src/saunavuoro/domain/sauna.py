@@ -26,12 +26,12 @@ class Sauna:
             raise RuleViolationError("Turn length must be positive.")
         if not self.turn_start_times():
             raise RuleViolationError("Opening hours are shorter than one turn.")
-        if min(
-            self.max_extra_bookings_per_week,
-            self.max_days_ahead,
-            self.cancellation_deadline_hours,
-        ) < 0:
-            raise RuleViolationError("Booking rules must not be negative.")
+        if self.max_extra_bookings_per_week < 0:
+            raise RuleViolationError("Maximum extra bookings per week must not be negative.")
+        if self.max_days_ahead < 0:
+            raise RuleViolationError("Maximum days ahead must not be negative.")
+        if self.cancellation_deadline_hours < 0:
+            raise RuleViolationError("Cancellation deadline must not be negative.")
 
     def turn_start_times(self) -> list[time]:
         day = date(2000, 1, 1)

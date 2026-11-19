@@ -1,5 +1,6 @@
 """API tests for /saunas: real FastAPI app, in-memory storage."""
 
+import pytest
 from fastapi.testclient import TestClient
 
 from saunavuoro.api.app import create_app
@@ -45,4 +46,44 @@ def test_crud_flow() -> None:
 def test_invalid_opening_hours_return_422() -> None:
     client = make_client()
     response = client.post(URL, json=SAUNA | {"closes_at": "16:00"})
+    assert response.status_code == 422
+
+
+def test_administrator_can_set_and_update_booking_rules() -> None:
+    client = make_client()
+    rules = {
+        "turn_length_minutes": 90,
+        "max_extra_bookings_per_week": 3,
+        "max_days_ahead": 30,
+        "cancellation_deadline_hours": 4,
+    }
+
+    created = client.post(URL, json=SAUNA | rules)
+    assert created.status_code == 201
+    body = created.json()
+    assert {name: body[name] for name in rules} == rules
+
+    sauna_id = body["id"]
+    new_rules = {
+        "turn_length_minutes": 30,
+        "max_extra_bookings_per_week": 0,
+        "max_days_ahead": 7,
+        "cancellation_deadline_hours": 1,
+    }
+    updated = client.put(f"{URL}/{sauna_id}", json=SAUNA | new_rules)
+    assert updated.status_code == 200
+    assert {name: updated.json()[name] for name in new_rules} == new_rules
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("turn_length_minutes", 0),
+        ("max_extra_bookings_per_week", -1),
+        ("max_days_ahead", -1),
+        ("cancellation_deadline_hours", -1),
+    ],
+)
+def test_invalid_booking_rules_return_422(field: str, value: int) -> None:
+    response = make_client().post(URL, json=SAUNA | {field: value})
     assert response.status_code == 422
