@@ -34,6 +34,12 @@ def create_app(uow_factory: UnitOfWorkFactory, clock: Clock) -> FastAPI:
     app.state.uow_factory = uow_factory
     app.state.clock = clock
     register_error_handlers(app)
+
+    @app.get("/health", include_in_schema=False)
+    def health() -> dict[str, str]:
+        """Liveness probe used by development tools."""
+        return {"status": "ok"}
+
     for module in (apartments, residents, saunas, weekly_turns, bookings):
         app.include_router(module.router, prefix="/api/v1")
     return app
