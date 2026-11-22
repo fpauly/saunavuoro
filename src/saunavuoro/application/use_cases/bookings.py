@@ -1,8 +1,9 @@
 from datetime import date, datetime, time, timedelta
 from uuid import UUID
 
-from saunavuoro.application.errors import NotFoundError
+from saunavuoro.application.errors import ConflictError, NotFoundError
 from saunavuoro.application.ports import UnitOfWork
+from saunavuoro.domain.booking import Booking
 
 
 class CheckAvailability:
@@ -20,11 +21,7 @@ class CheckAvailability:
             if sauna is None:
                 raise NotFoundError("Sauna", sauna_id)
 
-            start_of_day = datetime.combine(
-                booking_date,
-                time.min,
-            )
-
+            start_of_day = datetime.combine(booking_date, time.min)
             end_of_day = start_of_day + timedelta(days=1)
 
             bookings = uow.bookings.list_by_sauna(
@@ -43,3 +40,45 @@ class CheckAvailability:
                 for slot in sauna.turn_start_times()
                 if slot not in booked_times
             ]
+
+
+class CreateBooking:
+    def __init__(self, uow: UnitOfWork) -> None:
+        self._uow = uow
+
+    def execute(
+        self,
+        sauna_id: UUID,
+        apartment_id: UUID,
+        starts_at: datetime,
+        ends_at: datetime,
+    ) -> Booking:
+
+        booking = Booking(
+            sauna_id=sauna_id,
+            apartment_id=apartment_id,
+            starts_at=starts_at,
+            ends_at=ends_at,
+        )
+
+        with self._uow as uow:
+            if uow.saunas.get(sauna_id) is None:
+                raise NotFoundError("Sauna", sauna_id)
+
+            if uow.apartments.get(apartment_id) is None:
+                raise NotFoundError("Apartment", apartment_id)
+
+            existing_booking = uow.bookings.get_by_slot(
+                sauna_id,
+                starts_at,
+            )
+
+            if existing_booking is not None:
+                raise ConflictError(
+                    "This sauna turn is already booked."
+                )
+
+            uow.bookings.add(booking)
+            uow.commit()
+
+        return booking

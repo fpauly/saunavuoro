@@ -1,0 +1,24 @@
+[33mcc89255[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mronja[m[33m)[m added booking availability endpoint
+[33mf31c229[m added booking availability use case
+[33m79df6a6[m created booking use case module
+[33m42efca2[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m Merge pull request #4 from fpauly/feature/admin-sauna-opening-hours
+[33m0a3dbc4[m[33m ([m[1;31morigin/feature/admin-sauna-opening-hours[m[33m)[m feat: health endpoint
+[33m38593e2[m fix: windows setup
+[33me1f43cc[m feat: sauna opening hours
+[33m722c1fc[m Merge pull request #3 from danylosh/feature/admin
+[33m3bc8162[m[33m ([m[1;31morigin/feature/admin[m[33m)[m Merge branch 'main' into feature/admin
+[33mce7a9d9[m fix pyproject
+[33m5b01256[m admin to CRUD apartments, residents, saunas.
+[33m8b7593e[m docs:add task list
+[33mb902f81[m Merge pull request #2 from fpauly/feat/foundation
+[33mce7acea[m[33m ([m[1;31morigin/feat/foundation[m[33m)[m feat:foundation and docs
+[33m4a71ad3[m Merge pull request #1 from fpauly/feat/database-tables
+[33m0d95629[m[33m ([m[1;31morigin/feat/database-tables[m[33m)[m docs: update ER diagram and design for the final data model
+[33mccc1f46[m feat: add database tables for residents, saunas, weekly turns and bookings
+[33m60f8975[m docs: add diagrams
+[33mdea79c8[m docs: add architecture design
+[33m0effd34[m feat: set up Clean Architecture skeleton
+[33mf0f4a01[m doc:update readme
+[33mcf80bfb[m update readme
+[33m59d147a[m add fan's name
+[33m7b8a4dc[m Initial project structure and README
