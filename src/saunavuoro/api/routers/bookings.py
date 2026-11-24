@@ -7,6 +7,7 @@ from saunavuoro.api.dependencies import Uow
 from saunavuoro.api.schemas.bookings import BookingIn, BookingOut
 from saunavuoro.api.schemas.errors import error_responses
 from saunavuoro.application.use_cases.bookings import (
+    CancelBooking,
     CheckAvailability,
     CreateBooking,
 )
@@ -25,6 +26,7 @@ def check_availability(
     uow: Uow = None,
 ) -> list[str]:
     """Return all free turn start times for a sauna on a given day."""
+
     available_slots = CheckAvailability(uow).execute(
         sauna_id,
         booking_date,
@@ -43,7 +45,7 @@ def create_booking(
     body: BookingIn,
     uow: Uow,
 ) -> BookingOut:
-    """Create a one-off sauna booking."""
+    """Create a one-off booking."""
 
     booking = CreateBooking(uow).execute(
         body.sauna_id,
@@ -53,3 +55,18 @@ def create_booking(
     )
 
     return BookingOut.from_entity(booking)
+
+
+@router.delete(
+    "/{booking_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Cancel a booking",
+    responses=error_responses(404, 422),
+)
+def cancel_booking(
+    booking_id: UUID,
+    uow: Uow,
+) -> None:
+    """Cancel an existing booking."""
+
+    CancelBooking(uow).execute(booking_id)

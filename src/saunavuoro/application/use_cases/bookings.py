@@ -82,3 +82,28 @@ class CreateBooking:
             uow.commit()
 
         return booking
+
+
+class CancelBooking:
+    def __init__(self, uow: UnitOfWork) -> None:
+        self._uow = uow
+
+    def execute(
+        self,
+        booking_id: UUID,
+    ) -> None:
+        with self._uow as uow:
+            booking = uow.bookings.get(booking_id)
+
+            if booking is None:
+                raise NotFoundError(
+                    "Booking",
+                    booking_id,
+                )
+
+            uow.bookings.delete(
+                booking_id,
+            )
+
+            uow.commit()
+            
