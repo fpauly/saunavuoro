@@ -29,3 +29,10 @@ class BookingOut(BaseModel):
             starts_at=booking.starts_at,
             ends_at=booking.ends_at,
         )
+
+
+class ApartmentBookingsOut(BaseModel):
+    apartment_id: UUID
+    weekly_turn_id: UUID | None = None
+    bookings: list[BookingOut]
+    

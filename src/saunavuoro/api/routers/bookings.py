@@ -4,12 +4,17 @@ from uuid import UUID
 from fastapi import APIRouter, Query, status
 
 from saunavuoro.api.dependencies import Uow
-from saunavuoro.api.schemas.bookings import BookingIn, BookingOut
+from saunavuoro.api.schemas.bookings import (
+    ApartmentBookingsOut,
+    BookingIn,
+    BookingOut,
+)
 from saunavuoro.api.schemas.errors import error_responses
 from saunavuoro.application.use_cases.bookings import (
     CancelBooking,
     CheckAvailability,
     CreateBooking,
+    ListApartmentBookings,
 )
 
 router = APIRouter(prefix="/bookings", tags=["bookings"])
@@ -70,3 +75,30 @@ def cancel_booking(
     """Cancel an existing booking."""
 
     CancelBooking(uow).execute(booking_id)
+
+
+@router.get(
+    "/apartment/{apartment_id}",
+    summary="List apartment bookings",
+    responses=error_responses(404, 422),
+)
+def list_apartment_bookings(
+    apartment_id: UUID,
+    uow: Uow,
+) -> ApartmentBookingsOut:
+    """Return weekly turn and upcoming bookings of an apartment."""
+
+    bookings, weekly_turn_id = ListApartmentBookings(
+        uow,
+    ).execute(
+        apartment_id,
+    )
+
+    return ApartmentBookingsOut(
+        apartment_id=apartment_id,
+        weekly_turn_id=weekly_turn_id,
+        bookings=[
+            BookingOut.from_entity(booking)
+            for booking in bookings
+        ],
+    )
