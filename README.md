@@ -113,6 +113,7 @@ mypy            # strict type checking
 
 - Architecture and design: `docs/design.md`
 - Architecture decisions: `docs/adr/`
+- Trade-off analysis: `docs/trade-offs.md`
 - AI usage: `docs/ai-usage.md`
 
 ## Assumptions
