@@ -54,6 +54,7 @@ def test_all_repositories_save_and_load(
         assert uow.saunas.get(sauna.id) == sauna
         assert uow.weekly_turns.get_by_apartment(apartment.id) == turn
         assert uow.weekly_turns.get_by_slot(sauna.id, 4, time(18)) == turn
+        assert uow.weekly_turns.list_all() == [turn]
         assert uow.bookings.get_by_slot(sauna.id, starts) == booking
         week = (starts - timedelta(days=3), starts + timedelta(days=3))
         assert uow.bookings.list_by_sauna(sauna.id, *week) == [booking]

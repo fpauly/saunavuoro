@@ -61,6 +61,12 @@ class SqlAlchemyWeeklyTurnRepository:
         )
         return [_to_entity(row) for row in rows]
 
+    def list_all(self) -> list[WeeklyTurn]:
+        rows = self._session.scalars(
+            select(WeeklyTurnModel).order_by(WeeklyTurnModel.weekday, WeeklyTurnModel.start_time)
+        )
+        return [_to_entity(row) for row in rows]
+
     def update(self, turn: WeeklyTurn) -> None:
         row = self._session.get(WeeklyTurnModel, turn.id)
         if row is not None:

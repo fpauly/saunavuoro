@@ -106,6 +106,9 @@ class InMemoryWeeklyTurnRepository:
         found = [t for t in self.items.values() if t.sauna_id == sauna_id]
         return sorted(found, key=lambda t: (t.weekday, t.start_time))
 
+    def list_all(self) -> list[WeeklyTurn]:
+        return sorted(self.items.values(), key=lambda t: (t.weekday, t.start_time))
+
     def update(self, turn: WeeklyTurn) -> None:
         self.items[turn.id] = turn
 

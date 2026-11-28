@@ -89,11 +89,14 @@ All endpoints are under `/api/v1`.
 | Apartments | `POST/GET /apartments`, `GET/PUT/DELETE /apartments/{id}`                 |
 | Residents  | `POST/GET /residents` (`?apartment_id=` filter), `GET/PUT/DELETE /residents/{id}` |
 | Saunas     | `POST/GET /saunas`, `GET/PUT/DELETE /saunas/{id}`                         |
+| Weekly turns | `POST/GET /weekly-turns` (`?sauna_id=`, `?apartment_id=` filters), `GET/PUT/DELETE /weekly-turns/{id}` |
 
 Rules:
 
 - Apartment numbers are unique.
 - A resident must belong to an existing apartment.
+- An apartment can have at most one weekly turn, and a weekly turn slot (sauna, weekday, start time) belongs to at most one apartment.
+- A weekly turn must start at one of the sauna's turn start times.
 - Missing resources return `404`; invalid input returns `422`; conflicting data returns `409`.
 
 A copy of the specification is stored in `docs/openapi.json`. Update it after changing the API:
@@ -127,7 +130,7 @@ mypy            # strict type checking
 - Backend only; no frontend. Swagger UI is used for testing and demonstration.
 - No authentication or authorisation.
 - No payments or notifications.
-- Weekly turns and one-off bookings are not implemented yet.
+- One-off bookings are not implemented yet.
 
 ## Team
 
